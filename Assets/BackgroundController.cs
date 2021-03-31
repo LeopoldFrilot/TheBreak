@@ -4,14 +4,24 @@ using UnityEngine;
 
 public class BackgroundController : MonoBehaviour
 {
-    [SerializeField] Color[] backgrounds;
+    [SerializeField] Material[] skyboxes;
+    [SerializeField] float[] rotationSpeeds;
+    [SerializeField] Vector3[] axisOfRotations;
     [SerializeField] float[] timeBreaks;
+
     [Header("For viewing purposes")]
     [SerializeField] bool started = false;
-    [SerializeField] int curBackground;
+    [SerializeField] int curSkybox;
     [SerializeField] int curTimeBreak;
     [SerializeField] float curTime;
 
+    // Cached references
+    Rotate rotateScript;
+
+    private void Awake()
+    {
+        rotateScript = FindObjectOfType<Rotate>();
+    }
     private void Update()
     {
         if(started)
@@ -19,10 +29,15 @@ public class BackgroundController : MonoBehaviour
             curTime += Time.deltaTime;
             if (curTime >= timeBreaks[curTimeBreak])
             {
-                Camera.main.backgroundColor = backgrounds[curBackground];
-                curBackground += 1 % backgrounds.Length;
+                RenderSettings.skybox = skyboxes[curSkybox];
+                rotateScript.rotateSpeed = rotationSpeeds[curSkybox];
+                rotateScript.axis = axisOfRotations[curSkybox];
+                curSkybox = (curSkybox + 1) % skyboxes.Length;
                 curTimeBreak++;
-                if (curTimeBreak >= timeBreaks.Length) started = false;
+                if (curTimeBreak >= timeBreaks.Length)
+                {
+                    started = false;
+                }
             }
         }
     }
@@ -31,7 +46,7 @@ public class BackgroundController : MonoBehaviour
     {
         started = true;
         curTime = 0;
-        curBackground = 0;
+        curSkybox = 0;
         curTimeBreak = 0;
     }
 }
