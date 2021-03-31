@@ -8,6 +8,8 @@ public class BackgroundController : MonoBehaviour
     [SerializeField] float[] rotationSpeeds;
     [SerializeField] Vector3[] axisOfRotations;
     [SerializeField] float[] timeBreaks;
+    [SerializeField] GameObject[] levels;
+    [SerializeField] float[] levelSpeeds;
 
     [Header("For viewing purposes")]
     [SerializeField] bool started = false;
@@ -22,6 +24,7 @@ public class BackgroundController : MonoBehaviour
     {
         rotateScript = FindObjectOfType<Rotate>();
     }
+
     private void Update()
     {
         if(started)
@@ -30,8 +33,13 @@ public class BackgroundController : MonoBehaviour
             if (curTime >= timeBreaks[curTimeBreak])
             {
                 RenderSettings.skybox = skyboxes[curSkybox];
-                rotateScript.rotateSpeed = rotationSpeeds[curSkybox];
-                rotateScript.axis = axisOfRotations[curSkybox];
+                if (rotateScript)
+                {
+                    rotateScript.rotateSpeed = rotationSpeeds[curSkybox];
+                    rotateScript.axis = axisOfRotations[curSkybox];
+                }
+                Destroy(levels[curSkybox]);
+                UpdateSpeeds();
                 curSkybox = (curSkybox + 1) % skyboxes.Length;
                 curTimeBreak++;
                 if (curTimeBreak >= timeBreaks.Length)
@@ -48,5 +56,18 @@ public class BackgroundController : MonoBehaviour
         curTime = 0;
         curSkybox = 0;
         curTimeBreak = 0;
+        var levels = FindObjectsOfType<Level>();
+        foreach (Level level in levels)
+        {
+            level.started = true;
+        }
+    }
+    void UpdateSpeeds()
+    {
+        var levels = FindObjectsOfType<Level>();
+        foreach(Level level in levels)
+        {
+            level.speed = levelSpeeds[curSkybox];
+        }
     }
 }

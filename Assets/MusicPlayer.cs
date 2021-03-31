@@ -4,6 +4,16 @@ using UnityEngine;
 
 public class MusicPlayer : MonoBehaviour
 {
+    private void Start()
+    {
+        StartCoroutine(Wait());
+    }
+
+    IEnumerator Wait()
+    {
+        yield return new WaitForSeconds(2f);
+        RestartAllTracks();
+    }
     public void RestartAllTracks()
     {
         GetComponent<AudioSource>().Stop();
